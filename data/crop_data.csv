@@ -1,0 +1,9 @@
+crop_name,temperature,rainfall,humidity,soil_type,water_requirement,water_efficiency,yield_potential,market_demand
+Wheat,20,500,60,loamy,2500,75,High,High
+Rice,25,1200,80,clay,5000,50,High,High
+Maize,25,600,65,loamy,3000,70,Medium,Medium
+Sorghum,30,400,50,sandy,2000,85,Medium,Medium
+Millet,28,350,45,sandy,1800,90,Medium,Low
+Barley,15,450,55,loamy,2200,80,Medium,Medium
+Soybean,22,600,70,loamy,2800,75,High,High
+Cotton,27,550,60,loamy,3200,65,High,Medium

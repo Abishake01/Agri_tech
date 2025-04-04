@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="hero-section">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Smart Farming Advisor</h1>
+                <p class="lead mb-4">AI-powered agricultural assistance to help farmers choose the best crops and optimize water usage for maximum yield and efficiency.</p>
+                <div class="d-flex gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started</a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/farmer-ai.png' %}" alt="Farmer with AI" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Helps Farmers</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mx-auto mb-4 p-3">
+                            <i class="bi bi-droplet fs-1"></i>
+                        </div>
+                        <h3>Water Optimization</h3>
+                        <p>Get precise recommendations on water usage based on your crops, soil type, and weather conditions.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon bg-success bg-gradient text-white rounded-circle mx-auto mb-4 p-3">
+                            <i class="bi bi-arrow-up-circle fs-1"></i>
+                        </div>
+                        <h3>Crop Recommendations</h3>
+                        <p>Discover the most suitable crops for your land based on current season and predicted weather patterns.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="feature-icon bg-info bg-gradient text-white rounded-circle mx-auto mb-4 p-3">
+                            <i class="bi bi-mic fs-1"></i>
+                        </div>
+                        <h3>Voice Assistant</h3>
+                        <p>Ask questions naturally and get instant agricultural advice in your local language.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="testimonials py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">What Farmers Say</h2>
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{% static 'images/farmer1.jpg' %}" class="rounded-circle me-3" width="60" height="60" alt="Farmer">
+                            <div>
+                                <h5 class="mb-0">Rajesh Kumar</h5>
+                                <p class="text-muted mb-0">Small Farmer, Punjab</p>
+                            </div>
+                        </div>
+                        <blockquote class="blockquote mb-0">
+                            <p>"This AI system helped me reduce water usage by 30% while maintaining the same yield. The crop recommendations were perfect for our weather conditions."</p>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-section {
+        padding: 5rem 0;
+        background: linear-gradient(rgba(255,255,255,0.9), rgba(120, 117, 117, 0.9)), url('{% static "images/farm-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}

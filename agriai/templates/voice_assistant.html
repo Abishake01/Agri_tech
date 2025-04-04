@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="bi bi-mic"></i> Farming Voice Assistant</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" id="voice-query" class="form-control" 
+                               placeholder="Ask your farming question...">
+                        <button id="start-listening" class="btn btn-success">
+                            <i class="bi bi-mic"></i> Voice
+                        </button>
+                    </div>
+                    <button id="submit-query" class="btn btn-primary">Submit</button>
+                    
+                    <div class="mt-3">
+                        <h5>Try asking:</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-action suggestion">What crops should I plant this season?</li>
+                            <li class="list-group-item list-group-item-action suggestion">How much water does wheat need?</li>
+                            <li class="list-group-item list-group-item-action suggestion">What's the best crop for sandy soil?</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="assistant-response" class="p-3 bg-light rounded" 
+                         style="min-height: 200px; display: none;">
+                        <h4><i class="bi bi-robot"></i> Assistant Response</h4>
+                        <div id="response-text" class="mt-2"></div>
+                        <div id="response-actions" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const voiceInput = document.getElementById('voice-query');
+    const startBtn = document.getElementById('start-listening');
+    const submitBtn = document.getElementById('submit-query');
+    const responseDiv = document.getElementById('assistant-response');
+    const responseText = document.getElementById('response-text');
+    const responseActions = document.getElementById('response-actions');
+    
+    // Check browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    
+    // Update your voice recognition code with this improved version
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    // Error handling with specific messages
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        
+        let errorMessage = 'Voice input error: ';
+        switch(event.error) {
+            case 'no-speech':
+                errorMessage = 'No speech was detected. Please try speaking again.';
+                break;
+            case 'audio-capture':
+                errorMessage = 'No microphone was found. Please ensure a microphone is connected.';
+                break;
+            case 'not-allowed':
+                errorMessage = 'Microphone access was blocked. Please allow microphone access in your browser settings.';
+                // Show instructions for enabling microphone
+                showMicrophoneEnableInstructions();
+                break;
+            case 'network':
+                errorMessage = 'Network error occurred. Please check your internet connection.';
+                break;
+            case 'service-not-allowed':
+                errorMessage = 'Speech recognition service is not allowed. Please try in a different browser.';
+                break;
+            default:
+                errorMessage = 'Error occurred during voice recognition: ' + event.error;
+        }
+        
+        showError(errorMessage);
+        resetListeningState();
+    };
+
+    // Success handlers
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        console.log('Voice input:', transcript);
+        voiceInput.value = transcript;
+        submitQuery(transcript);
+        resetListeningState();
+    };
+
+    recognition.onend = function() {
+        resetListeningState();
+    };
+
+    // Start listening function
+    function startListening() {
+        if (!navigator.onLine) {
+            showError('Voice recognition requires internet connection. Please check your network.');
+            return;
+        }
+
+        try {
+            startBtn.innerHTML = '<i class="bi bi-mic-mute"></i> Listening...';
+            startBtn.classList.add('listening');
+            voiceInput.placeholder = 'Speak now...';
+            recognition.start();
+        } catch (error) {
+            console.error('Error starting recognition:', error);
+            showError('Could not start voice recognition: ' + error.message);
+            resetListeningState();
+        }
+    }
+
+    // Reset UI state
+    function resetListeningState() {
+        startBtn.innerHTML = '<i class="bi bi-mic"></i> Voice';
+        startBtn.classList.remove('listening');
+        voiceInput.placeholder = 'Ask your farming question...';
+    }
+
+    // Show microphone enable instructions
+    function showMicrophoneEnableInstructions() {
+        const instructions = `
+            <div class="alert alert-info mt-3">
+                <h5>Enable Microphone Access</h5>
+                <p>To use voice input, please allow microphone access:</p>
+                <ul>
+                    <li><strong>Chrome:</strong> Click the lock/padlock icon in the address bar > Site settings > Microphone > Allow</li>
+                    <li><strong>Firefox:</strong> Click the camera/microphone icon in the address bar > Allow</li>
+                    <li><strong>Safari:</strong> Preferences > Websites > Microphone > Allow for this site</li>
+                </ul>
+                <button onclick="window.location.reload()" class="btn btn-sm btn-primary">I've enabled it</button>
+            </div>
+        `;
+        document.getElementById('assistant-response').innerHTML += instructions;
+    }
+
+    // Event listener for voice button
+    startBtn.addEventListener('click', function() {
+        // Check if we're already listening
+        if (startBtn.classList.contains('listening')) {
+            recognition.stop();
+            return;
+        }
+        
+        // Request microphone permission first
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function() {
+                // Permission granted, start listening
+                startListening();
+            })
+            .catch(function(err) {
+                console.error('Microphone permission error:', err);
+                showError('Microphone access was denied. Please allow microphone access to use voice commands.');
+                showMicrophoneEnableInstructions();
+            });
+    });
+} else {
+    // Browser doesn't support speech recognition
+    startBtn.disabled = true;
+    startBtn.title = "Voice input not supported in your browser";
+    showError('Voice input is not supported in your current browser. Try Chrome, Edge, or Safari.');
+}
+    
+    // Voice input handler
+    startBtn.addEventListener('click', function() {
+        if (!recognition) return;
+        
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function() {
+                    startBtn.innerHTML = '<i class="bi bi-mic-mute"></i> Listening...';
+                    recognition.start();
+                })
+                .catch(function(err) {
+                    showError('Could not access microphone: ' + err.message);
+                });
+        } else {
+            showError('Microphone access not supported');
+        }
+    });
+    
+    // Text input handler
+    submitBtn.addEventListener('click', function() {
+        const query = voiceInput.value.trim();
+        if (query) {
+            submitQuery(query);
+        }
+    });
+    
+    // Suggestion click handler
+    document.querySelectorAll('.suggestion').forEach(item => {
+        item.addEventListener('click', function() {
+            voiceInput.value = this.textContent;
+            submitQuery(this.textContent);
+        });
+    });
+    
+    // Submit query to backend
+    function submitQuery(query) {
+        if (!query) return;
+        
+        // Show loading state
+        responseText.innerHTML = '<div class="text-center"><div class="spinner-border"></div> Processing...</div>';
+        responseDiv.style.display = 'block';
+        responseActions.innerHTML = '';
+        
+        axios.post('/voice-assistant-api/', {
+            query: query
+        }, {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(function(response) {
+            // Display response
+            responseText.innerHTML = response.data.text;
+            
+            // Add action buttons if needed
+            if (response.data.redirect) {
+                const btn = document.createElement('a');
+                btn.href = response.data.redirect;
+                btn.className = 'btn btn-primary';
+                btn.innerHTML = '<i class="bi bi-arrow-right"></i> Go to Page';
+                responseActions.appendChild(btn);
+            }
+            
+            // Show suggestions if available
+            if (response.data.suggestions) {
+                const suggestionsDiv = document.createElement('div');
+                suggestionsDiv.className = 'mt-3';
+                suggestionsDiv.innerHTML = '<h6>You might ask:</h6>';
+                
+                const list = document.createElement('div');
+                list.className = 'list-group';
+                
+                response.data.suggestions.forEach(suggestion => {
+                    const item = document.createElement('button');
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = suggestion;
+                    item.addEventListener('click', function() {
+                        voiceInput.value = suggestion;
+                        submitQuery(suggestion);
+                    });
+                    list.appendChild(item);
+                });
+                
+                suggestionsDiv.appendChild(list);
+                responseActions.appendChild(suggestionsDiv);
+            }
+        })
+        .catch(function(error) {
+            showError(error.response?.data?.error || 'Failed to get response from assistant');
+        });
+    }
+    
+    function showError(message) {
+        responseText.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+        responseDiv.style.display = 'block';
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

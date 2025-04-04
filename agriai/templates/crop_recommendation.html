@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3>Crop Recommendations for {{ season|title }}</h3>
+            </div>
+            <div class="card-body">
+                <p>Based on your farm conditions and current season, here are the most suitable crops:</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>Water Efficiency</th>
+                                <th>Yield Potential</th>
+                                <th>Market Demand</th>
+                                <th>Water Needed (per acre)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for crop in recommendations %}
+                            <tr>
+                                <td>{{ crop.crop_name }}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: {{ crop.water_efficiency }}%">
+                                            {{ crop.water_efficiency }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ crop.yield_potential }}</td>
+                                <td>{{ crop.market_demand }}</td>
+                                <td>{{ crop.water_requirement }} liters</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Water-Saving Tips</h5>
+                    <ul>
+                        <li>Consider drip irrigation for water-intensive crops</li>
+                        <li>Mulch around plants to reduce evaporation</li>
+                        <li>Water early in the morning to minimize loss</li>
+                        <li>Monitor soil moisture to avoid over-watering</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h3>Water Management</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Calculate</button>
+                </form>
+                
+                {% if calculated %}
+                <div class="mt-4">
+                    <h4>Results</h4>
+                    <div class="alert alert-info">
+                        <p>With your current well specifications and assuming a pump rate of 5 liters/second:</p>
+                        <p class="fw-bold">It would take approximately {{ drain_time }} hours to drain the well completely.</p>
+                    </div>
+                    
+                    <div id="well-visualization" class="mt-4" style="height: 400px; width: 100%;"></div>
+                    
+                    <div class="mt-4">
+                        <h5>Water Conservation Tips</h5>
+                        <ul>
+                            <li>Schedule irrigation during cooler parts of the day</li>
+                            <li>Implement rainwater harvesting</li>
+                            <li>Use soil moisture sensors to optimize watering</li>
+                            <li>Consider water-efficient irrigation methods like drip systems</li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if calculated %}
+        // Convert diameter from meters to a reasonable scale for visualization
+        const radius = {{ well_details.diameter }} / 2;
+        const depth = {{ well_details.depth }};
+        const waterLevel = {{ well_details.water_level }};
+        
+        // Well structure (hollow cylinder)
+        const wellStructure = {
+            type: 'mesh3d',
+            x: [0, 0, radius, radius],
+            y: [0, radius, radius, 0],
+            z: [0, 0, 0, 0],
+            i: [0, 0, 0, 1],
+            j: [1, 1, 2, 2],
+            k: [2, 3, 3, 3],
+            intensity: [0, 0.5, 1],
+            colorscale: 'Blues',
+            opacity: 0.8,
+            name: 'Well Structure'
+        };
+        
+        // Water in the well
+        const water = {
+            type: 'cylinder',
+            x: [0],
+            y: [0],
+            z: [0],
+            opacity: 0.6,
+            color: 'blue',
+            radius: radius * 0.9,  // Slightly smaller than well diameter
+            height: waterLevel,
+            hoverinfo: 'none',
+            name: 'Water Level'
+        };
+        
+        const layout = {
+            title: 'Well Cross-Section',
+            scene: {
+                xaxis: {title: 'Width (m)'},
+                yaxis: {title: 'Length (m)'},
+                zaxis: {title: 'Depth (m)', range: [depth, 0]},
+                camera: {
+                    eye: {x: 1.5, y: 1.5, z: 0.8},
+                    up: {x: 0, y: 0, z: 1}
+                },
+                aspectratio: {x: 1, y: 1, z: 2}
+            },
+            margin: {l: 0, r: 0, b: 0, t: 30}
+        };
+        
+        Plotly.newPlot('well-visualization', [wellStructure, water], layout);
+        {% endif %}
+    });
+</script>
+{% endblock %}

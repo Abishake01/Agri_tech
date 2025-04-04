@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Farmer Dashboard</h2>
+        <span class="badge bg-success">Active</span>
+    </div>
+    <p class="text-muted">Welcome back, {{ user.first_name|default:user.username }}!</p>
+</div>
+
+<div class="row">
+    <!-- Farm Summary Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Farm Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Location</h6>
+                            <p class="h5">{{ profile.location }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Farm Size</h6>
+                            <p class="h5">{{ profile.farm_size }} acres</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Soil Type</h6>
+                            <p class="h5">{{ profile.get_soil_type_display }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1">Water Source</h6>
+                            <p class="h5">{{ profile.get_water_source_display }}</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'complete_profile' %}" class="btn btn-outline-primary mt-2">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Season Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Current Season</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-sun fs-1 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h3 class="mb-0">{{ current_season|title }}</h3>
+                        <p class="text-muted mb-0">Best time for planting</p>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Tip:</strong> {{ season_tip }}
+                </div>
+                <a href="{% url 'crop_recommendation' %}" class="btn btn-success">Get Crop Recommendations</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'water_management' %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="bi bi-droplet-fill text-primary me-3"></i>
+                        Water Management
+                    </a>
+                    <a href="{% url 'voice_assistant' %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="bi bi-mic-fill text-success me-3"></i>
+                        Ask Voice Assistant
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="bi bi-calendar-check-fill text-info me-3"></i>
+                        Farming Calendar
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="bi bi-graph-up text-warning me-3"></i>
+                        Yield Predictions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-md-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Activity</h5>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Query Type</th>
+                                <th>Question</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for query in recent_queries %}
+                            <tr>
+                                <td>{{ query.timestamp|date:"M d" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if query.query_type == 'crop' %}bg-success
+                                        {% elif query.query_type == 'water' %}bg-info
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ query.get_query_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ query.question|truncatechars:40 }}</td>
+                                <td>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No recent activity</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Water Efficiency Chart -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Water Efficiency Analysis</h5>
+            </div>
+            <div class="card-body">
+                <div id="waterChart" style="height: 300px;"></div>
+                <p class="text-muted mt-2">Comparison of your water usage with recommended levels for your crops.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Water Efficiency Chart
+        const ctx = document.getElementById('waterChart').getContext('2d');
+        const waterChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Wheat', 'Rice', 'Maize', 'Vegetables'],
+                datasets: [
+                    {
+                        label: 'Your Usage (liters/acre)',
+                        data: [2800, 5200, 3200, 4500],
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Recommended (liters/acre)',
+                        data: [2500, 5000, 3000, 4000],
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Water (liters per acre)'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

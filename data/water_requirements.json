@@ -1,0 +1,26 @@
+[
+    {
+        "crop": "Wheat",
+        "water_per_acre": 2500,
+        "frequency_days": 7,
+        "best_time": "morning",
+        "growth_stages": {
+            "initial": 20,
+            "development": 30,
+            "mid-season": 40,
+            "late": 10
+        }
+    },
+    {
+        "crop": "Rice",
+        "water_per_acre": 5000,
+        "frequency_days": 3,
+        "best_time": "any",
+        "growth_stages": {
+            "initial": 15,
+            "development": 25,
+            "mid-season": 45,
+            "late": 15
+        }
+    }
+]

@@ -1,0 +1,74 @@
+body {
+    padding-top: 60px;
+}
+
+.card {
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.progress {
+    height: 25px;
+}
+
+.progress-bar {
+    font-size: 0.9rem;
+    line-height: 25px;
+}
+
+#well-visualization {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Voice assistant specific */
+#start-recording {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Voice Assistant Styles */
+#assistant-response {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s ease;
+}
+
+.suggestion {
+    cursor: pointer;
+}
+
+.suggestion:hover {
+    background-color: #f8f9fa;
+}
+
+/* Microphone button animation */
+.listening {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(25, 135, 84, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+}
+/* Add to your styles.css */
+.listening {
+    animation: pulse 1.5s infinite;
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+#voice-query:disabled {
+    background-color: #f8f9fa;
+}
