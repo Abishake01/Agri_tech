@@ -3,7 +3,7 @@
 
 An AI-powered agricultural assistant that helps farmers with crop recommendations and water management through voice and text interactions.
 
-![Project Screenshot](/static/images/screenshot.png)
+![Project Screenshot](/staticfiles/images/screenshot.png)
 
 ## Features
 
@@ -34,7 +34,7 @@ An AI-powered agricultural assistant that helps farmers with crop recommendation
 ### Setup
 1. Clone the repository:
    ```
-   git clone https://github.com/Abishake01/smart-farming-advisor.git
+   https://github.com/Abishake01/Agri_tech.git
    cd smart-farming-advisor
    ```
 
@@ -87,8 +87,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Project Maintainer - [Your Name](mailto:your.email@example.com)  
-Project Link: [https://github.com/Abishake01/smart-farming-advisor](https://github.com/Abishake01/smart-farming-advisor)
+Project Maintainer - [Abishake](mailto:abishake381@gmail.com)  
+Project Link: [https://github.com/Abishake01/Agri_tech](https://github.com/Abishake01/Agri_tech)
 ```
 
 Would you like me to add any specific deployment instructions or additional configuration details?
